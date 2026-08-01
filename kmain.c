@@ -1,4 +1,4 @@
-#include io
+#include "drivers/io/io.h"
 #define FB_GREEN      2
 #define FB_DARK_GREY  8
 
@@ -22,6 +22,7 @@ void fb_write_cell(unsigned int i, char c, unsigned char fg, unsigned char bg)
 
 void kmain(void)
 {
-    // Write 'A' at cell position 0 using your C function
-    fb_write_cell(0, 'A', FB_GREEN, FB_DARK_GREY);
+    char msg[] = "Hello, world!\n";
+    write(msg, sizeof(msg) - 1);  /* writes 13 bytes, advances cursor and scrolls */
+    for (;;) { /* hang */ }
 }

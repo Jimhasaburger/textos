@@ -1,4 +1,4 @@
-OBJECTS = loader.o kmain.o
+OBJECTS = loader.o drivers/io/io.o drivers/io/io_asm.o kmain.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
          -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
@@ -34,3 +34,4 @@ os.iso: kernel.elf
 
 clean:
 	rm -rf *.o kernel.elf os.iso
+	rm -rf drivers/io/*.o
