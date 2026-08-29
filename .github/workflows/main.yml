@@ -1,0 +1,33 @@
+name: main
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-iso:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+
+      - name: dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential nasm genisoimage grub-pc-bin
+          
+      - name: make iso
+        run: |
+          make release
+
+      - name: create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: releases/*.iso
+          tag_name: v${{ github.run_number }}
+          name: "Textos v${{ github.run_number }}"
+          body: "Automated build"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
