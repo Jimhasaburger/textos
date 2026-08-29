@@ -18,7 +18,6 @@ kernel.elf: $(OBJECTS)
 os.iso: kernel.elf
 	mkdir -p iso/boot/grub
 	cp kernel.elf iso/boot/kernel.elf
-	# If menu.lst is stored elsewhere, adjust path, otherwise leave it
 	cp iso/boot/grub/menu.lst iso/boot/grub/menu.lst 2>/dev/null || true
 	genisoimage -R \
 	            -b boot/grub/stage2_eltorito \
@@ -40,7 +39,7 @@ os.iso: kernel.elf
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o drivers/io/*.o kernel.elf *.iso iso releases
+	rm -rf *.o drivers/io/*.o kernel.elf *.iso iso/boot/kernel.elf releases
 	rm -rf OS/*.iso
 
 release: clean all
