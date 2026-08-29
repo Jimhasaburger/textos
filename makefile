@@ -6,6 +6,10 @@ LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf
 
+VERSION ?= $(shell grep '^version=' ver.txt | cut -d'=' -f2)
+ISONAME ?= $(shell grep '^isoname=' ver.txt | cut -d'=' -f2)
+
+
 all: kernel.elf os.iso
 
 kernel.elf: $(OBJECTS)
@@ -14,17 +18,20 @@ kernel.elf: $(OBJECTS)
 os.iso: kernel.elf
 	mkdir -p iso/boot/grub
 	cp kernel.elf iso/boot/kernel.elf
+	# If menu.lst is stored elsewhere, adjust path, otherwise leave it
+	cp iso/boot/grub/menu.lst iso/boot/grub/menu.lst 2>/dev/null || true
 	genisoimage -R \
 	            -b boot/grub/stage2_eltorito \
 	            -no-emul-boot \
 	            -boot-load-size 4 \
-	            -A os \
+	            -A $(ISONAME) \
 	            -input-charset utf8 \
 	            -quiet \
 	            -boot-info-table \
-	            -o os.iso \
+	            -o $(ISONAME).iso \
 	            iso
-	cp os.iso OS/
+	mkdir -p OS
+	cp $(ISONAME).iso OS/
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -33,5 +40,11 @@ os.iso: kernel.elf
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso
-	rm -rf drivers/io/*.o
+	rm -rf *.o drivers/io/*.o kernel.elf *.iso iso releases
+	rm -rf OS/*.iso
+
+release: clean all
+	mkdir -p releases
+	cp $(ISONAME).iso releases/$(ISONAME)-v$(VERSION).iso
+
+.PHONY: all clean release
